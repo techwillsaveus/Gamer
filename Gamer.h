@@ -5,6 +5,8 @@
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include "Tone/Tone.h"
+#include "SoftwareSerial.h"
 
 class Gamer {
 public:
@@ -29,27 +31,26 @@ public:
 	
 	// Outputs
 	void updateDisplay();
-	static void refreshDisplay();
 	void clear();
+	void printImage(byte* img);
 	void setLED(bool value);
-	void playNote(int note);
-	void playNote(int note, int duration);
+	void toggleLED();
+	void playNote(uint16_t note);
+	void playNote(uint16_t note, uint32_t duration);
 	void playFrequency(int freq);
-	byte display[8][8];
 	
 	// Variables
-	byte image[8];
-	static byte pulseCount;
+	byte display[8][8];
+	byte pulseCount;
+	byte buzzerCount;
 	byte nextRow;
 	byte currentRow;
-	static byte counter;
+	byte counter;
+	byte image[8];
 	
-	void (*isrCallback)();
-	
-	// Functions
-	void writeToDriver(byte dataOut);
-	void writeToRegister(byte dataOut);
-	void updateRow();
+	void isrRoutine();
+	Tone buzzer;
+	SoftwareSerial serial;
 	
 private:
 	
@@ -61,9 +62,20 @@ private:
 	#define DAT2 8
 	#define LAT2 9
 	#define OE 10
+	#define LED 13
+	#define BUZZER 2
+	#define RX 5
+	#define TX 4
 	
+	// Variables
+	
+	
+	// Functions
+	void writeToDriver(byte dataOut);
+	void writeToRegister(byte dataOut);
+	void checkSerial();
+	void updateRow();
 	
 };
 
-extern Gamer Gamer1;
 #endif

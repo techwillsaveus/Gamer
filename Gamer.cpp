@@ -1,47 +1,44 @@
-#include "Gamer.h"
-
-// Variables
-// volatile byte pulseCount;
-// volatile byte nextRow;
-// byte currentRow;
-// byte counter;
-
-Gamer Gamer1; // Preinstantiate
 /*
-// Interrupt service routine
-ISR(TIMER2_COMPB_vect) {
-	pulseCount++;
-	if(pulseCount >= 50) {
-		nextRow = 1;
-		pulseCount = 0;
-	}
-}
+TO-DO
+-Fix IR
+-Button events
+-Buzzer play melody
+-LDR as button event
+-Scrolling text?
 */
 
+
+#include "Gamer.h"
+
+Gamer *thisGamer = NULL;
+
 // Interrupt service routine
 ISR(TIMER2_COMPB_vect) {
-	Gamer1.isrCallback();
+	thisGamer->isrRoutine();
 }
 
-Gamer::Gamer() {
-	
+Gamer::Gamer() : serial(SoftwareSerial(TX, RX)) {
+	serial.begin(2400);
 }
 
 void Gamer::begin() {
-	currentRow = 0x80;
-	
+	//currentRow = 0x80;
+	::thisGamer = this;
 	pinMode(3, OUTPUT);
-	TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); // Just enable output on Pin 3 and disable it on Pin 11
+	pinMode(2, OUTPUT);
+	for(int i=6; i<=10; i++) pinMode(i, OUTPUT);
+	pinMode(2, OUTPUT);
+	pinMode(13, OUTPUT);
+	TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
 	TCCR2B = _BV(WGM22) | _BV(CS22);
-	OCR2A = 52; // defines the frequency 51 = 38.4 KHz, 54 = 36.2 KHz, 58 = 34 KHz, 62 = 32 KHz
-	OCR2B = 26;  // deines the duty cycle - Half the OCR2A value for 50%
-	TCCR2B = TCCR2B & 0b00111000 | 0x2;
+	OCR2A = 51; // defines the frequency 51 = 38.4 KHz, 54 = 36.2 KHz, 58 = 34 KHz, 62 = 32 KHz
+	OCR2B = 26;
+	TCCR2B = (TCCR2B & 0b00111000) | 0x2;
 	
 	TIMSK2 = _BV(OCIE2B); // Enable output compare match b
 	
-	//Gamer1.currentRow = 0x80;
-	//isrCallback = Gamer1.refreshDisplay;
-	
+	buzzer.begin(2);
+	//ir = SoftwareSerial(RX, TX);
 }
 
 void Gamer::updateDisplay() {
@@ -61,22 +58,43 @@ void Gamer::clear() {
 	updateDisplay();
 }
 
-// Display updating
-void Gamer::update() {
-	if(nextRow) {
-		updateRow();
-		nextRow = 0;
+void Gamer::printImage(byte* img) {
+	for(int j=0; j<8; j++) {
+		for(int i=0; i<8; i++) {
+			display[i][j] = (img[j] & (1 << (7-i))) != 0;
+		}
+	}
+	updateDisplay();
+}
+
+// Set the value of the Gamer LED
+void Gamer::setLED(bool value) {
+	digitalWrite(LED, value);
+}
+
+// Toggle the Gamer LED
+void Gamer::toggleLED() {
+	digitalWrite(LED, !digitalRead(LED));
+}
+/*
+void Gamer::playNote(uint16_t note) {
+	buzzer.play(note);
+}
+
+void Gamer::playNote(uint16_t note, uint32_t duration) {
+	buzzer.play(note, duration);
+}
+*/
+
+void Gamer::checkSerial() {
+	if(serial.available() > 0) {
+		char inByte = serial.read();
+		if(inByte == 'H') setLED(HIGH);
+		else if(inByte == 'L') setLED(LOW);
 	}
 }
 
-void Gamer::refreshDisplay() {
-	digitalWrite(13, HIGH);
-	Gamer1.pulseCount++;
-	if(Gamer1.pulseCount >= 50) {
-		Gamer1.updateRow();
-		Gamer1.pulseCount = 0;
-	}
-}
+
 
 // Load the next row in the display.
 void Gamer::updateRow() {
@@ -116,4 +134,18 @@ void Gamer::writeToRegister(byte dataOut) {
 	}
 	digitalWrite(LAT2, HIGH);
 	digitalWrite(LAT2, LOW);
+}
+
+void Gamer::isrRoutine() {
+	buzzerCount++;
+	pulseCount++;
+	checkSerial();
+	if(pulseCount >= 50) {
+		updateRow();
+		pulseCount = 0;
+	}
+	// if(buzzerCount >= 3) {
+	// 	digitalWrite(BUZZER, !digitalRead(BUZZER));
+	// 	buzzerCount = 0;
+	// }
 }
