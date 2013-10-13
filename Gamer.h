@@ -5,8 +5,8 @@
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "Tone/Tone.h"
-#include "SoftwareSerial.h"
+//#include "Tone/Tone.h"
+//#include "SoftwareSerial.h"
 
 class Gamer {
 public:
@@ -49,8 +49,8 @@ public:
 	byte image[8];
 	
 	void isrRoutine();
-	Tone buzzer;
-	SoftwareSerial serial;
+	//Tone buzzer;
+	//SoftwareSerial serial;
 	
 private:
 	

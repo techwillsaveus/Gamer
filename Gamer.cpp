@@ -17,8 +17,9 @@ ISR(TIMER2_COMPB_vect) {
 	thisGamer->isrRoutine();
 }
 
-Gamer::Gamer() : serial(SoftwareSerial(TX, RX)) {
-	serial.begin(2400);
+//Gamer::Gamer() : serial(SoftwareSerial(TX, RX)) {
+Gamer::Gamer() {
+	//serial.begin(2400);
 }
 
 void Gamer::begin() {
@@ -37,7 +38,7 @@ void Gamer::begin() {
 	
 	TIMSK2 = _BV(OCIE2B); // Enable output compare match b
 	
-	buzzer.begin(2);
+	//buzzer.begin(2);
 	//ir = SoftwareSerial(RX, TX);
 }
 
@@ -87,11 +88,11 @@ void Gamer::playNote(uint16_t note, uint32_t duration) {
 */
 
 void Gamer::checkSerial() {
-	if(serial.available() > 0) {
-		char inByte = serial.read();
-		if(inByte == 'H') setLED(HIGH);
-		else if(inByte == 'L') setLED(LOW);
-	}
+	// if(serial.available() > 0) {
+	// 		char inByte = serial.read();
+	// 		if(inByte == 'H') setLED(HIGH);
+	// 		else if(inByte == 'L') setLED(LOW);
+	// 	}
 }
 
 
