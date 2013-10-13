@@ -5,8 +5,6 @@
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
-//#include "Tone/Tone.h"
-//#include "SoftwareSerial.h"
 
 class Gamer {
 public:
@@ -35,9 +33,6 @@ public:
 	void printImage(byte* img);
 	void setLED(bool value);
 	void toggleLED();
-	void playNote(uint16_t note);
-	void playNote(uint16_t note, uint32_t duration);
-	void playFrequency(int freq);
 	
 	// Variables
 	byte display[8][8];
@@ -49,8 +44,6 @@ public:
 	byte image[8];
 	
 	void isrRoutine();
-	//Tone buzzer;
-	//SoftwareSerial serial;
 	
 private:
 	
@@ -68,7 +61,6 @@ private:
 	#define TX 4
 	
 	// Variables
-	
 	
 	// Functions
 	void writeToDriver(byte dataOut);

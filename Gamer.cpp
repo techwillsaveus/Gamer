@@ -17,13 +17,10 @@ ISR(TIMER2_COMPB_vect) {
 	thisGamer->isrRoutine();
 }
 
-//Gamer::Gamer() : serial(SoftwareSerial(TX, RX)) {
 Gamer::Gamer() {
-	//serial.begin(2400);
 }
 
 void Gamer::begin() {
-	//currentRow = 0x80;
 	::thisGamer = this;
 	pinMode(3, OUTPUT);
 	pinMode(2, OUTPUT);
@@ -35,11 +32,7 @@ void Gamer::begin() {
 	OCR2A = 51; // defines the frequency 51 = 38.4 KHz, 54 = 36.2 KHz, 58 = 34 KHz, 62 = 32 KHz
 	OCR2B = 26;
 	TCCR2B = (TCCR2B & 0b00111000) | 0x2;
-	
 	TIMSK2 = _BV(OCIE2B); // Enable output compare match b
-	
-	//buzzer.begin(2);
-	//ir = SoftwareSerial(RX, TX);
 }
 
 void Gamer::updateDisplay() {
