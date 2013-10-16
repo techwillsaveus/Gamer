@@ -9,26 +9,26 @@
 class Gamer {
 public:
 	Gamer();
+	
 	// Keywords
 	#define UP 0
 	#define LEFT 1
 	#define RIGHT 2
 	#define DOWN 3
+	#define START 4
+	#define LDR 5
 	
 	// Setup
 	void begin();
 	void update();
 	
 	// Inputs
-	bool leftPressed();
-	bool rightPressed();
-	bool upPressed();
-	bool downPressed();
-	bool ldrPressed();	
-	bool startPressed();
+	bool isPressed(uint8_t input);
+	bool isHeld(uint8_t input);
 	
 	// Outputs
 	void updateDisplay();
+	void allOn();
 	void clear();
 	void printImage(byte* img);
 	void setLED(bool value);

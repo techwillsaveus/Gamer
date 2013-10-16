@@ -20,6 +20,7 @@ ISR(TIMER2_COMPB_vect) {
 Gamer::Gamer() {
 }
 
+// Setup inputs, outputs, timers, etc. Call this from setup()!!
 void Gamer::begin() {
 	::thisGamer = this;
 	pinMode(3, OUTPUT);
@@ -35,6 +36,7 @@ void Gamer::begin() {
 	TIMSK2 = _BV(OCIE2B); // Enable output compare match b
 }
 
+// Burns the display[][] array onto the display. Only call when you're done changing pixels!
 void Gamer::updateDisplay() {
 	for(int j=0; j<8; j++) {
 		image[j] = 0x00;
@@ -45,6 +47,14 @@ void Gamer::updateDisplay() {
 	}
 }
 
+// Turn on all pixels on display
+void Gamer::allOn() {
+	for(int j=0; j<8; j++) {
+		for(int i=0; i<8; i++) display[i][j] = 1;
+	}
+	updateDisplay();
+}
+
 void Gamer::clear() {
 	for(int j=0; j<8; j++) {
 		for(int i=0; i<8; i++) display[i][j] = 0;
@@ -52,6 +62,7 @@ void Gamer::clear() {
 	updateDisplay();
 }
 
+// Print an 8 byte array onto the display
 void Gamer::printImage(byte* img) {
 	for(int j=0; j<8; j++) {
 		for(int i=0; i<8; i++) {
@@ -70,25 +81,8 @@ void Gamer::setLED(bool value) {
 void Gamer::toggleLED() {
 	digitalWrite(LED, !digitalRead(LED));
 }
-/*
-void Gamer::playNote(uint16_t note) {
-	buzzer.play(note);
-}
 
-void Gamer::playNote(uint16_t note, uint32_t duration) {
-	buzzer.play(note, duration);
-}
-*/
-
-void Gamer::checkSerial() {
-	// if(serial.available() > 0) {
-	// 		char inByte = serial.read();
-	// 		if(inByte == 'H') setLED(HIGH);
-	// 		else if(inByte == 'L') setLED(LOW);
-	// 	}
-}
-
-
+// Internal display refreshing and writing to ICs ----------------------
 
 // Load the next row in the display.
 void Gamer::updateRow() {
@@ -118,6 +112,7 @@ void Gamer::writeToDriver(byte dataOut) {
 	digitalWrite(OE, LOW);
 }
 
+// Write to the MIC5891 shift register (anodes)
 void Gamer::writeToRegister(byte dataOut) {
 	digitalWrite(LAT2, LOW);
 	
@@ -130,16 +125,12 @@ void Gamer::writeToRegister(byte dataOut) {
 	digitalWrite(LAT2, LOW);
 }
 
+// Run Interrupt Service Routine tasks
 void Gamer::isrRoutine() {
 	buzzerCount++;
 	pulseCount++;
-	checkSerial();
 	if(pulseCount >= 50) {
 		updateRow();
 		pulseCount = 0;
 	}
-	// if(buzzerCount >= 3) {
-	// 	digitalWrite(BUZZER, !digitalRead(BUZZER));
-	// 	buzzerCount = 0;
-	// }
 }
