@@ -25,8 +25,11 @@ public:
 	// Inputs
 	bool isPressed(uint8_t input);
 	bool isHeld(uint8_t input);
+	int ldrValue();
+	void setldrThreshold(uint16_t threshold);
 	
 	// Outputs
+	void setRefreshRate(uint16_t refreshRate);
 	void updateDisplay();
 	void allOn();
 	void clear();
@@ -49,23 +52,31 @@ private:
 	
 	// Keywords
 	#define CLK1 6
-	#define DAT1 8
-	#define LAT1 9
+	#define DAT 8
+	#define LAT 9
 	#define CLK2 7
-	#define DAT2 8
-	#define LAT2 9
+	#define DAT 8
+	#define LAT 9
 	#define OE 10
 	#define LED 13
 	#define BUZZER 2
 	#define RX 5
 	#define TX 4
 	
+	#define DEBOUNCETIME 50
+	
 	// Variables
+	uint16_t _refreshRate;
+	bool buttonFlags[6];
+	unsigned long buttonLastPressed[6];
+	int lastInputState[6];
+	uint16_t ldrThreshold;
 	
 	// Functions
 	void writeToDriver(byte dataOut);
 	void writeToRegister(byte dataOut);
 	void checkSerial();
+	void checkInputs();
 	void updateRow();
 	
 };

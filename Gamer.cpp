@@ -23,17 +23,55 @@ Gamer::Gamer() {
 // Setup inputs, outputs, timers, etc. Call this from setup()!!
 void Gamer::begin() {
 	::thisGamer = this;
+	_refreshRate = 50;
+	ldrThreshold = 300;
+	
+	// Setup outputs
 	pinMode(3, OUTPUT);
-	pinMode(2, OUTPUT);
 	for(int i=6; i<=10; i++) pinMode(i, OUTPUT);
 	pinMode(2, OUTPUT);
 	pinMode(13, OUTPUT);
+	
+	// Setup inputs
+	DDRC = B00000;
+	PORTC = B11111;
+	
+	// Timer setup
 	TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
 	TCCR2B = _BV(WGM22) | _BV(CS22);
-	OCR2A = 51; // defines the frequency 51 = 38.4 KHz, 54 = 36.2 KHz, 58 = 34 KHz, 62 = 32 KHz
+	OCR2A = 51;
 	OCR2B = 26;
 	TCCR2B = (TCCR2B & 0b00111000) | 0x2;
-	TIMSK2 = _BV(OCIE2B); // Enable output compare match b
+	TIMSK2 = _BV(OCIE2B);
+}
+
+// Inputs --------------------------------
+
+// Returns true if a button has been pressed recently
+bool Gamer::isPressed(uint8_t input) {
+	if(buttonFlags[input]) {
+		buttonFlags[input] = 0;
+		return true;
+	}
+	else return false;
+}
+
+// Returns true if the button is currently held down
+bool Gamer::isHeld(uint8_t input) {
+	bool result = (PINC & (1<<input)) >> input;
+	return !result;
+}
+
+// Returns the current value of the LDR
+int Gamer::ldrValue() {
+	return analogRead(LDR);
+}
+
+// Outputs -------------------------------
+
+// Set the display's refresh rate. 1 = 1 row per timer cycle. 10 = 1 row every 10 timer cycles
+void Gamer::setRefreshRate(uint16_t refreshRate) {
+	_refreshRate = refreshRate;
 }
 
 // Burns the display[][] array onto the display. Only call when you're done changing pixels!
@@ -103,34 +141,58 @@ void Gamer::writeToDriver(byte dataOut) {
 	
 	for(int x=0; x<=7; x++) {
     	digitalWrite(CLK1, LOW);
-    	digitalWrite(DAT1, (dataOut & (1<<x)) >> x);
+    	digitalWrite(DAT, (dataOut & (1<<x)) >> x);
     	digitalWrite(CLK1, HIGH);
   	}
 
-	digitalWrite(LAT1, HIGH);
-	digitalWrite(LAT1, LOW);
+	digitalWrite(LAT, HIGH);
+	digitalWrite(LAT, LOW);
 	digitalWrite(OE, LOW);
 }
 
 // Write to the MIC5891 shift register (anodes)
 void Gamer::writeToRegister(byte dataOut) {
-	digitalWrite(LAT2, LOW);
+	digitalWrite(LAT, LOW);
 	
 	for(int y=0; y<=7; y++) {
-		digitalWrite(DAT2, (dataOut & (1<<y)) >> y);
+		digitalWrite(DAT, (dataOut & (1<<y)) >> y);
 		digitalWrite(CLK2, HIGH);
 		digitalWrite(CLK2, LOW);
 	}
-	digitalWrite(LAT2, HIGH);
-	digitalWrite(LAT2, LOW);
+	digitalWrite(LAT, HIGH);
+	digitalWrite(LAT, LOW);
+}
+
+// Periodically check if inputs are pressed (+ debouncing)
+void Gamer::checkInputs() {
+	int currentInputState[6];
+	for(int i=0; i<6; i++) {
+		if(i != 5) {
+			currentInputState[i] = (PINC & (1<<i)) >> i;
+			if(currentInputState[i] != lastInputState[i]) {
+				if(currentInputState[i] == 0) {
+					buttonFlags[i] = 1;
+				}
+			}
+			lastInputState[i] = currentInputState[i];
+		}
+		else {
+			currentInputState[i] = ldrValue();
+			if(currentInputState[i] - lastInputState[i] > 220 && currentInputState[i] > lastInputState[i]) buttonFlags[i] = 1;
+			lastInputState[i] = currentInputState[i];
+		}
+	}
 }
 
 // Run Interrupt Service Routine tasks
 void Gamer::isrRoutine() {
 	buzzerCount++;
 	pulseCount++;
-	if(pulseCount >= 50) {
+	if(pulseCount >= _refreshRate) {
 		updateRow();
 		pulseCount = 0;
+	}
+	if(pulseCount == _refreshRate/2) {
+		checkInputs();
 	}
 }
