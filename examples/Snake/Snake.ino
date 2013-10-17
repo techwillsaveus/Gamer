@@ -73,7 +73,7 @@ void loop() {
   gamer.display[currentX][currentY] = HIGH;
   snakeRec();
   isCollected();
-  delay(15,0);
+  delay(150);
   gamer.updateDisplay();
 }
 
