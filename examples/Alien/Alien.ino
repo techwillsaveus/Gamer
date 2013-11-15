@@ -54,5 +54,4 @@ void loop() {
   gamer.printImage(alien1);
   delay(500);
 }
-}
 
