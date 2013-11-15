@@ -47,4 +47,12 @@ void loop() {
   delay(500);
   gamer.printImage(alien3);
   delay(500);
+  gamer.printImage(alien3);
+  delay(500);
+  gamer.printImage(alien2);
+  delay(500);
+  gamer.printImage(alien1);
+  delay(500);
 }
+}
+
