@@ -1,10 +1,10 @@
 /*
 TO-DO
 -Fix IR
--Button events
 -Buzzer play melody
 -LDR as button event
--Scrolling text?
+-Scrolling text
+-Gamer clear with no update
 */
 
 
