@@ -67,6 +67,11 @@ int Gamer::ldrValue() {
 	return analogRead(LDR);
 }
 
+// Change the button threshold for the LDR.
+void Gamer::setldrThreshold(uint16_t threshold) {
+	ldrThreshold = threshold;
+}
+
 // Outputs -------------------------------
 
 // Set the display's refresh rate. 1 = 1 row per timer cycle. 10 = 1 row every 10 timer cycles
@@ -177,8 +182,8 @@ void Gamer::checkInputs() {
 			lastInputState[i] = currentInputState[i];
 		}
 		else {
-			currentInputState[i] = ldrValue();
-			if(currentInputState[i] - lastInputState[i] > 220 && currentInputState[i] > lastInputState[i]) buttonFlags[i] = 1;
+			currentInputState[i] = analogRead(LDR);
+			if(currentInputState[i] - lastInputState[i] >= ldrThreshold) buttonFlags[i] = 1;
 			lastInputState[i] = currentInputState[i];
 		}
 	}
