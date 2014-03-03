@@ -81,12 +81,16 @@ void Gamer::setRefreshRate(uint16_t refreshRate) {
 
 // Burns the display[][] array onto the display. Only call when you're done changing pixels!
 void Gamer::updateDisplay() {
+	byte newImage[8];
 	for(int j=0; j<8; j++) {
-		image[j] = 0x00;
+		newImage[j] = 0x00;
 		for(int i=0; i<8; i++) {
-			image[j] <<= 1;
-			image[j] |= display[i][j];
+			newImage[j] <<= 1;
+			newImage[j] |= display[i][j];
 		}
+	}
+	if(newImage != image) {
+		for(int i=0; i<8; i++) image[i] = newImage[i];
 	}
 }
 
