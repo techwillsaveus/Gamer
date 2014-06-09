@@ -36,6 +36,8 @@ public:
 	void printImage(byte* img);
 	void setLED(bool value);
 	void toggleLED();
+	void enableIRTX();
+	void disableIRTX();
 	
 	// Variables
 	byte display[8][8];
