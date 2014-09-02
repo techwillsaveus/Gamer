@@ -7,7 +7,7 @@ INSTALLING
 ==========
 
 1. Use the Download ZIP button to grab the Gamer library.
-2. Unzip the contents into your Arduino libraries folder (Documents/Arduino/libraries on OSX, My Documents\Arduino\libraries on Windows or ~/Documents/Arduino/libraries (or similar) on Linux)
+2. Unzip the folder, rename it to "Gamer", and place it into your Arduino libraries folder (Documents/Arduino/libraries on OSX, My Documents\Arduino\libraries on Windows or ~/Documents/Arduino/libraries (or similar) on Linux)
 
 TESTING
 =======
