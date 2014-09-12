@@ -1,4 +1,3 @@
-
 #ifndef Gamer_h
 #define Gamer_h
 
