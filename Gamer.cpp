@@ -13,7 +13,7 @@ TO-DO
 Gamer *thisGamer = NULL;
 
 // Interrupt service routine
-ISR(TIMER1_COMPA_vect) {
+ISR(TIMER2_COMPB_vect) {
 	thisGamer->isrRoutine();
 }
 
@@ -36,14 +36,17 @@ void Gamer::begin() {
 	DDRC = B00000;
 	PORTC = B11111;
 	
-	// Timer 1 setup
+	// Change analogue read resolution to 8-bit.
+	 ADCSRA &= ~(1 << ADPS2);
+	
+	// Timer 2 setup
 	noInterrupts();
-	TCCR1A = 0;
-	TCCR1B = 0;
-	TCCR1B |= (1 << WGM12); // CTC mode
-	TIMSK1 |= (1 << OCIE1A); // Enable interrupt on compare A
-	TCCR1B |= (1 << CS10); // Prescaler 1
-	OCR1A = 400;
+	TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
+	TCCR2B = _BV(WGM22) | _BV(CS22);
+	OCR2A = 51;
+	OCR2B = 26;
+	TCCR2B = (TCCR2B & 0b00111000) | 0x2;
+	TIMSK2 = _BV(OCIE2B);
 	interrupts();
 }
 
