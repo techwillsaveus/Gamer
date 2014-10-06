@@ -48,6 +48,12 @@ void Gamer::begin() {
 	TCCR2B = (TCCR2B & 0b00111000) | 0x2;
 	TIMSK2 = _BV(OCIE2B);
 	interrupts();
+	
+	for(int i=0; i<NUMFRAMESSTARTUPANIMATION; i++) {
+		printImage(startupAnimation[i]);
+		delay(100);
+	}
+	clear();
 }
 
 // Inputs --------------------------------
