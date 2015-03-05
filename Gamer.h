@@ -4,7 +4,6 @@
 
 #include "Arduino.h"
 #include <avr/interrupt.h>
-#include "SoftwareSerial.h"
 #include <avr/io.h>
 
 class Gamer {
@@ -64,7 +63,7 @@ public:
 	void isrRoutine();
 	
 private:
-	SoftwareSerial _serial;
+	
 	
 	// Keywords
 	#define CLK1 6

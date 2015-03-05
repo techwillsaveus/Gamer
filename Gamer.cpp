@@ -1,12 +1,3 @@
-
-
-/*
-TO-DO
- -LDR as button event
- -Scrolling text
- -Gamer clear with no update
- */
-
 #define sbi(port,bit) (port)|=(1<<(bit))
 
 int count;
@@ -23,8 +14,16 @@ bool playStop = false;
 char prevChar;
 
 #include "Gamer.h"
-#include "SoftwareSerial.h"
 #include "Arduino.h"
+
+// Include SoftSerial for IR communication
+#ifdef MULTIPLAYER
+#include "SoftwareSerial.h"
+#endif
+
+#ifdef MULTIPLAYER
+SoftwareSerial _serial;
+#endif
 
 Gamer *thisGamer = NULL;
 
@@ -70,8 +69,14 @@ digitalWrite(2,HIGH);
   }
 }
 
+#ifdef MULTIPLAYER
 Gamer::Gamer() : _serial(5,4){
 }
+#endif
+#ifndef MULTIPLAYER
+Gamer::Gamer(){
+}
+#endif
 
 
 void Gamer::play(int notes){
@@ -164,7 +169,10 @@ void Gamer::irPlay(){
 void Gamer::begin() {
 
   ::thisGamer = this;
+
+  #ifdef MULTIPLAYER
   _serial.begin(2400);
+  #endif
 
   _refreshRate = 50;
   ldrThreshold = 300;
@@ -399,6 +407,7 @@ void Gamer::isrRoutine() {
 
 }
 
+#ifdef MULTIPLAYER
 void Gamer::sendIr(String message){
 //irPlay();
 String mes = message;
@@ -433,3 +442,4 @@ i = n;
 return message;
 
 }
+#endif
