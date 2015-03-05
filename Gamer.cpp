@@ -75,7 +75,6 @@ Gamer::Gamer() : _serial(5,4){
 
 
 void Gamer::play(int notes){
-    notes = constrain(notes, 40, 240);
   
    TIMSK2 &= (1<<OCIE2A);
   
