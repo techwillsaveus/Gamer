@@ -25,31 +25,32 @@ SoftwareSerial _serial;
 
 Gamer *thisGamer = NULL;
 
-ISR(TIMER2_COMPB_vect){
-  if(ir == 1){
+ISR(TIMER2_COMPB_vect)
+{
+  if(ir == 1) {
     thisGamer->isrRoutine();
   }
 
 }
 
-
-ISR(TIMER2_COMPA_vect){
-  if(ir == 0){
-    if(player){
-
-      if (toggle2){
-        digitalWrite(2,HIGH);
+ISR(TIMER2_COMPA_vect)
+{
+  if(ir == 0) {
+    if(player) {
+      if (toggle2) {
+        // digitalWrite(2,HIGH);
+        PORTD |= _BV(PORTD2);
         toggle2 = 0;
         if(split % 10 == 0 ){
           thisGamer->isrRoutine();
         }
         split++;
       }
-      else{
-      	digitalWrite(2,LOW);
-
+      else {
+      	// digitalWrite(2,LOW);
+        PORTD &= ~_BV(PORTD2);
         toggle2 = 1;
-        if(split % 10== 0 ){
+        if(split % 10== 0 ) {
           thisGamer->isrRoutine();
         }
         split++;
@@ -57,13 +58,13 @@ ISR(TIMER2_COMPA_vect){
       split++;
     }
     else {
-    	digitalWrite(2,LOW);
-      if(split % 10 == 0 ){
+    	// digitalWrite(2,LOW);
+      PORTD &= ~_BV(PORTD2);
+      if(split % 10 == 0 ) {
         thisGamer->isrRoutine();
       }
     }
     split++;
-
   }
 }
 
@@ -335,8 +336,6 @@ void Gamer::writeToDriver(byte dataOut)
   PORTB &= ~_BV(PORTB1);
   PORTB &= ~_BV(PORTB2);
 }
-
-
 
 // Write to the MIC5891 shift register (anodes)
 void Gamer::writeToRegister(byte dataOut) 
