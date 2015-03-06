@@ -19,11 +19,9 @@ char prevChar;
 // Include SoftSerial for IR communication
 #ifdef MULTIPLAYER
 #include "SoftwareSerial.h"
-#endif
-
-#ifdef MULTIPLAYER
 SoftwareSerial _serial;
 #endif
+
 
 Gamer *thisGamer = NULL;
 
@@ -38,9 +36,9 @@ ISR(TIMER2_COMPB_vect){
 ISR(TIMER2_COMPA_vect){
   if(ir == 0){
     if(player){
-     
+
       if (toggle2){
-digitalWrite(2,HIGH);
+        digitalWrite(2,HIGH);
         toggle2 = 0;
         if(split % 10 == 0 ){
           thisGamer->isrRoutine();
@@ -80,24 +78,24 @@ Gamer::Gamer(){
 
 
 void Gamer::play(int notes){
-  
-   TIMSK2 &= (1<<OCIE2A);
-  
-  if(playTog == false){
-    playStop = false;
-        irTog = true;
-    ir = 0;
-    noInterrupts();
 
-    TCCR2A = ~(_BV(COM2B1)) | ~(_BV(WGM21)) | ~(_BV(WGM20));
-    TCCR2B = ~(_BV(WGM22)) | ~(_BV(CS22));
-    TCCR2B = (TCCR2B & 0b0000000) | 0;
-    TIMSK2 = ~(_BV(OCIE2B));
+ TIMSK2 &= (1<<OCIE2A);
+
+ if(playTog == false){
+  playStop = false;
+  irTog = true;
+  ir = 0;
+  noInterrupts();
+
+  TCCR2A = ~(_BV(COM2B1)) | ~(_BV(WGM21)) | ~(_BV(WGM20));
+  TCCR2B = ~(_BV(WGM22)) | ~(_BV(CS22));
+  TCCR2B = (TCCR2B & 0b0000000) | 0;
+  TIMSK2 = ~(_BV(OCIE2B));
 
 
-    OCR2A = 0;
-    TIMSK2 = 0;
-    OCR2B = 0;
+  OCR2A = 0;
+  TIMSK2 = 0;
+  OCR2B = 0;
     TCCR2A = 0;// set entire TCCR2A register to 0
     TCCR2B = 0;// same for TCCR2B
     TCNT2  = 0;//initialize counter value to 0
@@ -114,22 +112,22 @@ void Gamer::play(int notes){
 }
 
 void Gamer::stopPlay(){
- 
-  if(playStop == false){
-  TIMSK2 &= (1<<OCIE1A);
-    playStop = true;
-  player = false;
-  playTog = false;
-  OCR2A = 180;
-  digitalWrite(2,LOW);
-split = 0; 
-toggle2 = 0;
-irTog = false;
-irPlay();
-}
 
-OCR1A = 14;
-player = false;
+  if(playStop == false){
+    TIMSK2 &= (1<<OCIE1A);
+    playStop = true;
+    player = false;
+    playTog = false;
+    OCR2A = 180;
+    digitalWrite(2,LOW);
+    split = 0; 
+    toggle2 = 0;
+    irTog = false;
+    irPlay();
+  }
+
+  OCR1A = 14;
+  player = false;
 }
 
 void Gamer::irStop(){
@@ -137,17 +135,17 @@ void Gamer::irStop(){
   irTog = false;
 }
 void Gamer::irPlay(){
- 
+
  TIMSK2 &= ~(1<<OCIE2A);
-  TIMSK2 &= (1<<OCIE1B);
-  if(irTog == false){
-   
-    irTog = true;
+ TIMSK2 &= (1<<OCIE1B);
+ if(irTog == false){
+
+  irTog = true;
   
-    noInterrupts();
-    TCCR2A |=  ~(_BV(WGM21));
-    TCCR2B |= ~(_BV(CS21));   
-    TIMSK2 |=  ~(_BV(OCIE2A));
+  noInterrupts();
+  TCCR2A |=  ~(_BV(WGM21));
+  TCCR2B |= ~(_BV(CS21));   
+  TIMSK2 |=  ~(_BV(OCIE2A));
     TCCR2A = 0;// set entire TCCR2A register to 0
     TCCR2B = 0;// same for TCCR2B
     TCNT2  = 0;//initialize counter value to 0
@@ -158,7 +156,7 @@ void Gamer::irPlay(){
     TCCR2B = (TCCR2B & 0b00111000) | 0x2;
     TIMSK2 = _BV(OCIE2B);
     interrupts();
-   
+
     ir = 1;
      //stopPlay();
   }
@@ -180,9 +178,9 @@ void Gamer::begin() {
   // Setup outputs
   pinMode(3, OUTPUT);
   for(int i=6; i<=10; i++) pinMode(i, OUTPUT);
-  pinMode(2, OUTPUT);
+    pinMode(2, OUTPUT);
   pinMode(13, OUTPUT);
-pinMode(5,INPUT);
+  pinMode(5,INPUT);
 
 
 
@@ -272,14 +270,14 @@ void Gamer::allOn() {
   for(int j=0; j<8; j++) {
     for(int i=0; i<8; i++) display[i][j] = 1;
   }
-  updateDisplay();
+updateDisplay();
 }
 
 void Gamer::clear() {
   for(int j=0; j<8; j++) {
     for(int i=0; i<8; i++) display[i][j] = 0;
   }
-  updateDisplay();
+updateDisplay();
 }
 
 // Print an 8 byte array onto the display
@@ -305,7 +303,8 @@ void Gamer::toggleLED() {
 // Internal display refreshing and writing to ICs ----------------------
 
 // Load the next row in the display.
-void Gamer::updateRow() {
+void Gamer::updateRow() 
+{
   if(counter==8) {
     counter = 0;
     currentRow = 0x80;
@@ -318,49 +317,38 @@ void Gamer::updateRow() {
 }
 
 // Writes to the TLC5916 LED driver (cathodes)
-void Gamer::writeToDriver(byte dataOut) {
+void Gamer::writeToDriver(byte dataOut) 
+{
+  // Output enable HIGH
+  PORTB |= _BV(PORTB2);
 
-  //digitalWrite(OE, HIGH);
-    PORTB |= _BV(PORTB2);
-
+  // Send byte to driver
   for(int x=0; x<=7; x++) {
-  //digitalWrite(CLK1, LOW);
     PORTD &= ~_BV(PORTD6);
-     
-    digitalWrite(DAT, (dataOut & (1<<x)) >> x);
-  // digitalWrite(CLK1, HIGH);
-       PORTD |= _BV(PORTD6);
+    if(((dataOut & (1<<x)) >> x)) PORTB |= _BV(PORTB0);
+    else PORTB &= ~_BV(PORTB0);
+    PORTD |= _BV(PORTD6);
   }
 
   PORTD &= ~_BV(PORTD6);
-    PORTB |= _BV(PORTB1);
-   PORTB &= ~_BV(PORTB1);
-  //digitalWrite(CLK1, LOW);
-  //digitalWrite(LAT, HIGH);
-  //digitalWrite(LAT, LOW);
-  //digitalWrite(OE, LOW);
-   PORTB &= ~_BV(PORTB2);
-
+  PORTB |= _BV(PORTB1);
+  PORTB &= ~_BV(PORTB1);
+  PORTB &= ~_BV(PORTB2);
 }
 
 
 
 // Write to the MIC5891 shift register (anodes)
-void Gamer::writeToRegister(byte dataOut) {
-  //digitalWrite(LAT, LOW);
-
+void Gamer::writeToRegister(byte dataOut) 
+{
   for(int y=0; y<=7; y++) {
-    digitalWrite(DAT, (dataOut & (1<<y)) >> y);
-   // digitalWrite(CLK2, HIGH);
-   // digitalWrite(CLK2, LOW);
-   PORTD |= _BV(PORTD7);
-   PORTD &= ~_BV(PORTD7);
+    if((dataOut & (1<<y)) >> y) PORTB |= _BV(PORTB0);
+    else PORTB &= ~_BV(PORTB0);
+    PORTD |= _BV(PORTD7);
+    PORTD &= ~_BV(PORTD7);
   }
-    PORTB |= _BV(PORTB1);
-   PORTB &= ~_BV(PORTB1);
-  //digitalWrite(LAT, HIGH);
-  //digitalWrite(LAT, LOW);
-
+  PORTB |= _BV(PORTB1);
+  PORTB &= ~_BV(PORTB1);
 }
 
 // Periodically check if inputs are pressed (+ debouncing)
@@ -410,36 +398,36 @@ void Gamer::isrRoutine() {
 #ifdef MULTIPLAYER
 void Gamer::sendIr(String message){
 //irPlay();
-String mes = message;
+  String mes = message;
 //mes = '$'+ mes + '*';
-for(int i=0; i<mes.length(); i++) {
-  _serial.write(mes.charAt(i));
-  _serial.write(~mes.charAt(i));
-}
+  for(int i=0; i<mes.length(); i++) {
+    _serial.write(mes.charAt(i));
+    _serial.write(~mes.charAt(i));
+  }
 
 }
 
 String Gamer::irReceive(){
 //irPlay();
-char ch;
-String message;
-char cch,incch;
+  char ch;
+  String message;
+  char cch,incch;
 
-int n, i;
+  int n, i;
   n = _serial.available();
   
   
-i = n;
+  i = n;
 
-    while(i--){
-      ch = _serial.read();
-      if(ch == ~prevChar) message = message+prevChar;
-      prevChar = ch;
-      
-    }
+  while(i--){
+    ch = _serial.read();
+    if(ch == ~prevChar) message = message+prevChar;
+    prevChar = ch;
+
+  }
 
   String messo = message;
-return message;
+  return message;
 
 }
 #endif
