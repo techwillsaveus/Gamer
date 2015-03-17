@@ -78,25 +78,25 @@ Gamer::Gamer(){
 #endif
 
 
-void Gamer::play(int notes){
+void Gamer::playTone(int note){
 
- TIMSK2 &= (1<<OCIE2A);
+  TIMSK2 &= (1<<OCIE2A);
 
- if(playTog == false){
-  playStop = false;
-  irTog = true;
-  ir = 0;
-  noInterrupts();
+  if(playTog == false){
+    playStop = false;
+    irTog = true;
+    ir = 0;
+    noInterrupts();
 
-  TCCR2A = ~(_BV(COM2B1)) | ~(_BV(WGM21)) | ~(_BV(WGM20));
-  TCCR2B = ~(_BV(WGM22)) | ~(_BV(CS22));
-  TCCR2B = (TCCR2B & 0b0000000) | 0;
-  TIMSK2 = ~(_BV(OCIE2B));
+    TCCR2A = ~(_BV(COM2B1)) | ~(_BV(WGM21)) | ~(_BV(WGM20));
+    TCCR2B = ~(_BV(WGM22)) | ~(_BV(CS22));
+    TCCR2B = (TCCR2B & 0b0000000) | 0;
+    TIMSK2 = ~(_BV(OCIE2B));
 
 
-  OCR2A = 0;
-  TIMSK2 = 0;
-  OCR2B = 0;
+    OCR2A = 0;
+    TIMSK2 = 0;
+    OCR2B = 0;
     TCCR2A = 0;// set entire TCCR2A register to 0
     TCCR2B = 0;// same for TCCR2B
     TCNT2  = 0;//initialize counter value to 0
@@ -107,12 +107,12 @@ void Gamer::play(int notes){
     playTog = true;
   }
   player = true;
-  OCR2A = notes;
+  OCR2A = note;
   interrupts();
 
 }
 
-void Gamer::stopPlay(){
+void Gamer::stopTone(){
 
   if(playStop == false){
     TIMSK2 &= (1<<OCIE1A);
@@ -315,6 +315,11 @@ void Gamer::updateRow()
   writeToRegister(currentRow);
   currentRow >>= 1;
   counter++;
+}
+
+void Gamer::startAnimation()
+{
+  
 }
 
 // Writes to the TLC5916 LED driver (cathodes)

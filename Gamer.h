@@ -38,8 +38,8 @@ public:
 	void printImage(byte* img);
 	void setLED(bool value);
 	void toggleLED();
-	void play(int notes);
-	void stopPlay();
+	void playTone(int note);
+	void stopTone();
 	void irPlay();
 	void irStop();
 
@@ -90,6 +90,7 @@ private:
 
 	
 	// Functions
+	void startAnimation();
 	void writeToDriver(byte dataOut);
 	void writeToRegister(byte dataOut);
 	void checkSerial();
