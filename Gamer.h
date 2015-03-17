@@ -42,7 +42,9 @@ public:
 	void stopTone();
 	void irPlay();
 	void irStop();
-
+	void printString(String string);
+	void appendColumn(byte* screen, byte col);
+	void showScore(int n);
 
 		// Infared (BETA)
 	String irReceive();
@@ -90,6 +92,7 @@ private:
 
 	
 	// Functions
+	void setupLetters();
 	void startAnimation();
 	void writeToDriver(byte dataOut);
 	void writeToRegister(byte dataOut);
@@ -98,7 +101,12 @@ private:
 	void updateRow();
 	int currentInputState[6];
 	boolean tog;
-	
+
+	// Numbers and letters for printString
+	#define LETEND B10101010
+
+	const static uint8_t allLetters[53][9];
+	const static uint8_t allNumbers[10][8];
 };
 
 #endif
