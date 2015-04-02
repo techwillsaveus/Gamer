@@ -221,24 +221,6 @@ int Gamer::ldrValue() {
   return analogRead(LDR);
 }
 
-int Gamer::photoDiodeValue() {
-  int average[160];
-  long total;
-  int outcome = 0;
-  total = 0;
-  for(int i = 0; i < 160; i ++){
-    average[i] = analogRead(LDR);
-
-    delayMicroseconds(20);
-  }
-  for(int j = 0 ; j < 160; j++){
-    total = total + average[j];
-  }
-  outcome = total/160;
-  return outcome;
-}
-
-
 // Change the button threshold for the LDR.
 void Gamer::setldrThreshold(uint16_t threshold) {
   ldrThreshold = threshold;

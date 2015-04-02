@@ -28,8 +28,6 @@ public:
 	int ldrValue();
 	void setldrThreshold(uint16_t threshold);
 
-	int photoDiodeValue();
-	
 	// Outputs
 	void setRefreshRate(uint16_t refreshRate);
 	void updateDisplay();
