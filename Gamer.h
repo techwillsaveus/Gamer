@@ -44,13 +44,11 @@ public:
 	void appendColumn(byte* screen, byte col);
 	void showScore(int n);
 
-		// Infared (BETA)
+	// Infared (BETA)
 	String irReceive();
 	void sendIr(String message);
 	
-	
 	// Variables
-
 	byte display[8][8];
 	byte pulseCount;
 	byte buzzerCount;
@@ -59,11 +57,9 @@ public:
 	byte counter;
 	byte image[8];
 	
-	
 	void isrRoutine();
 	
 private:
-	
 	
 	// Keywords
 	#define CLK1 6
@@ -77,7 +73,6 @@ private:
 	#define BUZZER 2
 	#define RX 5
 	#define TX 4
-	
 	#define DEBOUNCETIME 50
 	
 	// Variables
@@ -86,8 +81,6 @@ private:
 	unsigned long buttonLastPressed[6];
 	int lastInputState[6];
 	uint16_t ldrThreshold;
-
-
 	
 	// Functions
 	void setupLetters();
@@ -102,7 +95,6 @@ private:
 
 	// Numbers and letters for printString
 	#define LETEND B10101010
-
 	const static uint8_t allLetters[53][9];
 	const static uint8_t allNumbers[10][8];
 };
