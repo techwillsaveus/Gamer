@@ -3,14 +3,11 @@
 int count;
 bool toggle2 = false;
 int split = 0;
-
 bool ir = false;
 bool irTog = false;
-
 bool player = false;
 bool playTog = false;
 bool playStop = false;
-
 char prevChar;
 
 #include "Gamer.h"
@@ -22,9 +19,9 @@ char prevChar;
 SoftwareSerial _serial;
 #endif
 
-
 Gamer *thisGamer = NULL;
 
+// Interrupt service routine
 ISR(TIMER2_COMPB_vect)
 {
   if(ir == 1) {
@@ -69,7 +66,7 @@ ISR(TIMER2_COMPA_vect)
 }
 
 #ifdef MULTIPLAYER
-Gamer::Gamer() : _serial(5,4){
+Gamer::Gamer() : _serial(5,4) {
 }
 #endif
 #ifndef MULTIPLAYER
@@ -78,8 +75,8 @@ Gamer::Gamer(){
 #endif
 
 
-void Gamer::playTone(int note){
-
+void Gamer::playTone(int note)
+{
   TIMSK2 &= (1<<OCIE2A);
 
   if(playTog == false){
@@ -92,7 +89,6 @@ void Gamer::playTone(int note){
     TCCR2B = ~(_BV(WGM22)) | ~(_BV(CS22));
     TCCR2B = (TCCR2B & 0b0000000) | 0;
     TIMSK2 = ~(_BV(OCIE2B));
-
 
     OCR2A = 0;
     TIMSK2 = 0;
@@ -109,11 +105,10 @@ void Gamer::playTone(int note){
   player = true;
   OCR2A = note;
   interrupts();
-
 }
 
-void Gamer::stopTone(){
-
+void Gamer::stopTone()
+{
   if(playStop == false){
     TIMSK2 &= (1<<OCIE1A);
     playStop = true;
@@ -131,15 +126,16 @@ void Gamer::stopTone(){
   player = false;
 }
 
-void Gamer::irStop(){
-
+void Gamer::irStop()
+{
   irTog = false;
 }
-void Gamer::irPlay(){
 
+void Gamer::irPlay()
+{
  TIMSK2 &= ~(1<<OCIE2A);
  TIMSK2 &= (1<<OCIE1B);
- if(irTog == false){
+ if(irTog == false) {
 
   irTog = true;
   
@@ -161,30 +157,24 @@ void Gamer::irPlay(){
     ir = 1;
      //stopPlay();
   }
-
 }
 
 // Setup inputs, outputs, timers, etc. Call this from setup()!!
-void Gamer::begin() {
-
+void Gamer::begin() 
+{
   ::thisGamer = this;
-
   #ifdef MULTIPLAYER
   _serial.begin(2400);
   #endif
-
   _refreshRate = 50;
   ldrThreshold = 300;
 
   // Setup outputs
   pinMode(3, OUTPUT);
   for(int i=6; i<=10; i++) pinMode(i, OUTPUT);
-    pinMode(2, OUTPUT);
+  pinMode(2, OUTPUT);
   pinMode(13, OUTPUT);
   pinMode(5,INPUT);
-
-
-
 
   // Setup inputs
   DDRC = B00000;
@@ -193,16 +183,14 @@ void Gamer::begin() {
   //Analog Read 16 divisor
   ADCSRA &= ~(1 << ADPS2);
 
-  irPlay();   
-
-  
-
+  irPlay();
 }
 
 // Inputs --------------------------------
 
 // Returns true if a button has been pressed recently
-bool Gamer::isPressed(uint8_t input) {
+bool Gamer::isPressed(uint8_t input) 
+{
   if(buttonFlags[input]) {
     buttonFlags[input] = 0;
     return true;
@@ -211,30 +199,35 @@ bool Gamer::isPressed(uint8_t input) {
 }
 
 // Returns true if the button is currently held down
-bool Gamer::isHeld(uint8_t input) {
+bool Gamer::isHeld(uint8_t input)
+{
   bool result = (PINC & (1<<input)) >> input;
   return !result;
 }
 
 // Returns the current value of the LDR
-int Gamer::ldrValue() {
+int Gamer::ldrValue()
+{
   return analogRead(LDR);
 }
 
 // Change the button threshold for the LDR.
-void Gamer::setldrThreshold(uint16_t threshold) {
+void Gamer::setldrThreshold(uint16_t threshold)
+{
   ldrThreshold = threshold;
 }
 
 // Outputs -------------------------------
 
 // Set the display's refresh rate. 1 = 1 row per timer cycle. 10 = 1 row every 10 timer cycles
-void Gamer::setRefreshRate(uint16_t refreshRate) {
+void Gamer::setRefreshRate(uint16_t refreshRate)
+{
   _refreshRate = refreshRate;
 }
 
 // Burns the display[][] array onto the display. Only call when you're done changing pixels!
-void Gamer::updateDisplay() {
+void Gamer::updateDisplay()
+{
   byte newImage[8];
   for(int j=0; j<8; j++) {
     newImage[j] = 0x00;
@@ -249,22 +242,25 @@ void Gamer::updateDisplay() {
 }
 
 // Turn on all pixels on display
-void Gamer::allOn() {
+void Gamer::allOn()
+{
   for(int j=0; j<8; j++) {
     for(int i=0; i<8; i++) display[i][j] = 1;
   }
-updateDisplay();
+  updateDisplay();
 }
 
-void Gamer::clear() {
+void Gamer::clear()
+{
   for(int j=0; j<8; j++) {
     for(int i=0; i<8; i++) display[i][j] = 0;
   }
-updateDisplay();
+  updateDisplay();
 }
 
 // Print an 8 byte array onto the display
-void Gamer::printImage(byte* img) {
+void Gamer::printImage(byte* img)
+{
   for(int j=0; j<8; j++) {
     for(int i=0; i<8; i++) {
       display[i][j] = (img[j] & (1 << (7-i))) != 0;
@@ -273,13 +269,28 @@ void Gamer::printImage(byte* img) {
   updateDisplay();
 }
 
+// Print a byte array onto the display, at an X/Y position.
+void Gamer::printImage(byte* img, int x, int y)
+{
+  for(int j=0; j<8; j++) {
+    for(int i=0; i<8; i++) {
+      if(i+x >= 0 && i+x < 8 && j+y >= 0 && j+y < 8) {
+        display[i+x][j+y] = (img[j] & (1 << (7-i))) != 0;
+      }
+    }
+  }
+  updateDisplay();
+}
+
 // Set the value of the Gamer LED
-void Gamer::setLED(bool value) {
+void Gamer::setLED(bool value)
+{
   digitalWrite(LED, value);
 }
 
 // Toggle the Gamer LED
-void Gamer::toggleLED() {
+void Gamer::toggleLED()
+{
   digitalWrite(LED, !digitalRead(LED));
 }
 
@@ -297,11 +308,6 @@ void Gamer::updateRow()
   writeToRegister(currentRow);
   currentRow >>= 1;
   counter++;
-}
-
-void Gamer::startAnimation()
-{
-  
 }
 
 // Writes to the TLC5916 LED driver (cathodes)
@@ -333,13 +339,14 @@ void Gamer::writeToRegister(byte dataOut)
     PORTD |= _BV(PORTD7);
     PORTD &= ~_BV(PORTD7);
   }
+
   PORTB |= _BV(PORTB1);
   PORTB &= ~_BV(PORTB1);
 }
 
 // Periodically check if inputs are pressed (+ debouncing)
-void Gamer::checkInputs() {
-
+void Gamer::checkInputs()
+{
   for(int i=0; i<6; i++) {
     if(i != 5) {
       currentInputState[i] = (PINC & (1<<i)) >> i;
@@ -355,13 +362,12 @@ void Gamer::checkInputs() {
       if(currentInputState[i] - lastInputState[i] >= ldrThreshold) buttonFlags[i] = 1;
       lastInputState[i] = currentInputState[i];
     }
-
   }
 }
 
 // Run Interrupt Service Routine tasks
-void Gamer::isrRoutine() {
-
+void Gamer::isrRoutine()
+{
   if(ir == 1){
     pulseCount++;
     if(pulseCount >= _refreshRate) {
@@ -373,35 +379,29 @@ void Gamer::isrRoutine() {
     }
   }
 
-
   if (ir == 0){
     updateRow();
     checkInputs();
   }
-
 }
 
 #ifdef MULTIPLAYER
-void Gamer::sendIr(String message){
-//irPlay();
+void Gamer::sendIr(String message)
+{
   String mes = message;
-//mes = '$'+ mes + '*';
   for(int i=0; i<mes.length(); i++) {
     _serial.write(mes.charAt(i));
     _serial.write(~mes.charAt(i));
   }
-
 }
 
 String Gamer::irReceive(){
-//irPlay();
   char ch;
   String message;
   char cch,incch;
 
   int n, i;
   n = _serial.available();
-  
   
   i = n;
 
@@ -412,13 +412,14 @@ String Gamer::irReceive(){
 
   }
 
-  String messo = message;
+  //String messo = message;
   return message;
 
 }
 #endif
 
-void Gamer::printString(String string) {
+void Gamer::printString(String string)
+{
   byte screen[8]={0};
   clear();
   for( int index = 0; index<string.length(); index++ ){
@@ -437,7 +438,8 @@ void Gamer::printString(String string) {
     appendColumn(screen, 0);
 }
 
-void Gamer::appendColumn(byte* screen, byte col){
+void Gamer::appendColumn(byte* screen, byte col)
+{
   for( int i=0; i<8; i++){
     screen[i]<<=1;
     if( (col&(1<<(7-i)))!=0 ) screen[i]++;
@@ -446,7 +448,8 @@ void Gamer::appendColumn(byte* screen, byte col){
   delay(70);
 }
 
-void Gamer::showScore(int n) {
+void Gamer::showScore(int n)
+{
   byte result[8];
   int dig1=n/10;
   int dig2=n%10;

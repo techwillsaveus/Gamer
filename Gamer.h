@@ -34,6 +34,7 @@ public:
 	void allOn();
 	void clear();
 	void printImage(byte* img);
+	void printImage(byte* img, int x, int y);
 	void setLED(bool value);
 	void toggleLED();
 	void playTone(int note);
@@ -84,7 +85,6 @@ private:
 	
 	// Functions
 	void setupLetters();
-	void startAnimation();
 	void writeToDriver(byte dataOut);
 	void writeToRegister(byte dataOut);
 	void checkSerial();
