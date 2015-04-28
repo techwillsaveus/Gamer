@@ -1,5 +1,13 @@
+/*
+This example shows you how to play tones on the
+Gamer's buzzer. Press one of the buttons, and you'll
+hear a sound. 
+*/
+
+// Include Gamer library.
 #include <Gamer.h>
 
+// Images displayed when the buttons are pressed.
 byte up[8] = {
   B00011000,
   B00111100,
@@ -40,13 +48,19 @@ byte left[8] = {
   B00110000,
   B00010000};
 
+// Create a copy of the Gamer library.
 Gamer gamer;
 
 void setup() {
+  // Start up Gamer.
   gamer.begin();
 }
 
 void loop() {
+  /* 
+  Depending on the button that's held down,
+  play a note!
+  */
   if(gamer.isHeld(UP)) {
     gamer.printImage(up);
     gamer.playTone(200);
@@ -63,8 +77,8 @@ void loop() {
     gamer.printImage(left);
     gamer.playTone(180);
   }
+  // Otherwise, silence!
   else gamer.stopTone();
 }
-
 
 

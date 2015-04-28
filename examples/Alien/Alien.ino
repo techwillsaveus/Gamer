@@ -1,7 +1,14 @@
+/*
+A cool jumping alien.
+*/
+
+// Include Gamer library
 #include <Gamer.h>
 
+// Create a copy of the Gamer library.
 Gamer gamer;
 
+// Here are three images we will animate.
 byte alien1[] = {
   B00000000,
   B00000000,
@@ -36,11 +43,12 @@ byte alien3[] = {
 };
 
 void setup() {
+  // Start up Gamer.
   gamer.begin();
-  gamer.setLED(HIGH);
 }
 
 void loop() {
+  // Show images, with a small delay in between.
   gamer.printImage(alien1);
   delay(500);
   gamer.printImage(alien2);

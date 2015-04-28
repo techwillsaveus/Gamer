@@ -6,8 +6,10 @@ We are mainly using the printImage function, but we're
 telling it to print the image in a specific position!
 */
 
+// Include Gamer library.
 #include <Gamer.h>
 
+// Create a copy of the Gamer library.
 Gamer gamer;
 
 // This is where we store the position of our character!
@@ -27,6 +29,7 @@ byte character[8] = {B10010000,
                      B00000000};
 
 void setup() {
+  // Start up Gamer.
   gamer.begin();
 }
 
