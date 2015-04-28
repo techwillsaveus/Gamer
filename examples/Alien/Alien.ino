@@ -1,5 +1,7 @@
 /*
-A cool jumping alien.
+A cool jumping alien. We have 3 images,
+which we will display on the Gamer screen
+one after another to make an animation. 
 */
 
 // Include Gamer library
