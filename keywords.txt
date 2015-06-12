@@ -1,0 +1,35 @@
+# Classes, datatypes | KEYWORD1
+
+Gamer	KEYWORD1
+
+# Methods and functions | KEYWORD2
+
+begin	KEYWORD2
+update	KEYWORD2
+isPressed	KEYWORD2
+isHeld	KEYWORD2
+ldrValue	KEYWORD2
+setldrThreshold	KEYWORD2
+setRefreshRate	KEYWORD2
+updateDisplay	KEYWORD2
+allOn	KEYWORD2
+clear	KEYWORD2
+printImage	KEYWORD2
+setLED	KEYWORD2
+toggleLED	KEYWORD2
+playTone	KEYWORD2
+stopTone	KEYWORD2
+irPlay	KEYWORD2
+irStop	KEYWORD2
+printString	KEYWORD2
+irReceive	KEYWORD2
+irSend	KEYWORD2
+
+# Constants | LITERAL1
+
+UP	LITERAL1
+LEFT	LITERAL1
+RIGHT	LITERAL1
+DOWN	LITERAL1
+START	LITERAL1
+LDR	LITERAL1
