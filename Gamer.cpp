@@ -1,17 +1,15 @@
-#define sbi(port,bit) (port)|=(1<<(bit))
+#include "Gamer.h"
+#include "Arduino.h"
 
 int count;
-bool toggle2 = false;
+bool toggleVal = false;
 int split = 0;
 bool ir = false;
 bool irTog = false;
-bool player = false;
+bool toneIsPlaying = false;
 bool playTog = false;
-bool playStop = false;
+bool toneStopped = false;
 char prevChar;
-
-#include "Gamer.h"
-#include "Arduino.h"
 
 // Include SoftSerial for IR communication
 #ifdef MULTIPLAYER
@@ -33,29 +31,29 @@ ISR(TIMER2_COMPB_vect)
 ISR(TIMER2_COMPA_vect)
 {
   if(ir == 0) {
-    if(player) {
-      if (toggle2) {
+    if(toneIsPlaying) {
+      if (toggleVal) {
         // digitalWrite(2,HIGH);
         PORTD |= _BV(PORTD2);
-        toggle2 = 0;
+        toggleVal = 0;
         if(split % 10 == 0 ){
           thisGamer->isrRoutine();
         }
         split++;
       }
       else {
-      	// digitalWrite(2,LOW);
+        // digitalWrite(2,LOW);
         PORTD &= ~_BV(PORTD2);
-        toggle2 = 1;
+        toggleVal = 1;
         if(split % 10== 0 ) {
           thisGamer->isrRoutine();
         }
         split++;
-      } 
+      }
       split++;
     }
     else {
-    	// digitalWrite(2,LOW);
+      // digitalWrite(2,LOW);
       PORTD &= ~_BV(PORTD2);
       if(split % 10 == 0 ) {
         thisGamer->isrRoutine();
@@ -65,6 +63,7 @@ ISR(TIMER2_COMPA_vect)
   }
 }
 
+// If Multiplayer is enabled, open up the IR serial.
 #ifdef MULTIPLAYER
 Gamer::Gamer() : _serial(5,4) {
 }
@@ -74,13 +73,16 @@ Gamer::Gamer(){
 }
 #endif
 
-
+/**
+  Plays a tone on the buzzer.
+  @param note the desired frequency
+ */
 void Gamer::playTone(int note)
 {
   TIMSK2 &= (1<<OCIE2A);
 
   if(playTog == false){
-    playStop = false;
+    toneStopped = false;
     irTog = true;
     ir = 0;
     noInterrupts();
@@ -93,59 +95,69 @@ void Gamer::playTone(int note)
     OCR2A = 0;
     TIMSK2 = 0;
     OCR2B = 0;
-    TCCR2A = 0;// set entire TCCR2A register to 0
-    TCCR2B = 0;// same for TCCR2B
-    TCNT2  = 0;//initialize counter value to 0
+    TCCR2A = 0;
+    TCCR2B = 0;
+    TCNT2  = 0;
     TCCR2A |= (1 << WGM21);
     OCR2A = 180;
-    TCCR2B |= (1 << CS21);   
+    TCCR2B |= (1 << CS21);
     TIMSK2 |= (1 << OCIE2A);
     playTog = true;
   }
-  player = true;
+  toneIsPlaying = true;
   OCR2A = note;
   interrupts();
 }
 
+/**
+  Stops any frequency on the buzzer pin.
+ */
 void Gamer::stopTone()
 {
-  if(playStop == false){
+  if(toneStopped == false){
     TIMSK2 &= (1<<OCIE1A);
-    playStop = true;
-    player = false;
+    toneStopped = true;
+    toneIsPlaying = false;
     playTog = false;
     OCR2A = 180;
     digitalWrite(2,LOW);
-    split = 0; 
-    toggle2 = 0;
+    split = 0;
+    toggleVal = 0;
     irTog = false;
     irPlay();
   }
 
   OCR1A = 14;
-  player = false;
+  toneIsPlaying = false;
 }
 
+/**
+  Stops the 38KHz wave for the IR transmitter.
+ */
 void Gamer::irStop()
 {
   irTog = false;
 }
 
+/**
+  Creates a 38KHz wave for the IR transmitter.
+ */
 void Gamer::irPlay()
 {
- TIMSK2 &= ~(1<<OCIE2A);
- TIMSK2 &= (1<<OCIE1B);
- if(irTog == false) {
+  TIMSK2 &= ~(1<<OCIE2A);
+  TIMSK2 &= (1<<OCIE1B);
 
-  irTog = true;
-  
-  noInterrupts();
-  TCCR2A |=  ~(_BV(WGM21));
-  TCCR2B |= ~(_BV(CS21));   
-  TIMSK2 |=  ~(_BV(OCIE2A));
-    TCCR2A = 0;// set entire TCCR2A register to 0
-    TCCR2B = 0;// same for TCCR2B
-    TCNT2  = 0;//initialize counter value to 0
+  if(irTog == false) {
+
+    irTog = true;
+
+    noInterrupts();
+    TCCR2A |=  ~(_BV(WGM21));
+    TCCR2B |= ~(_BV(CS21));
+    TIMSK2 |=  ~(_BV(OCIE2A));
+    TCCR2A = 0;
+    TCCR2B = 0;
+    TCNT2  = 0;
     TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
     TCCR2B = _BV(WGM22) | _BV(CS22);
     OCR2A = 51;
@@ -155,12 +167,13 @@ void Gamer::irPlay()
     interrupts();
 
     ir = 1;
-     //stopPlay();
   }
 }
 
-// Setup inputs, outputs, timers, etc. Call this from setup()!!
-void Gamer::begin() 
+/**
+  Initialises the library, starts timers, and sets pins. 
+ */
+void Gamer::begin()
 {
   ::thisGamer = this;
   #ifdef MULTIPLAYER
@@ -188,8 +201,12 @@ void Gamer::begin()
 
 // Inputs --------------------------------
 
-// Returns true if a button has been pressed recently
-bool Gamer::isPressed(uint8_t input) 
+/**
+  Checks if a button has been pressed (unique press)
+  @param input the button to check
+  @return The state of the button
+ */
+bool Gamer::isPressed(uint8_t input)
 {
   if(buttonFlags[input]) {
     buttonFlags[input] = 0;
@@ -198,20 +215,30 @@ bool Gamer::isPressed(uint8_t input)
   else return false;
 }
 
-// Returns true if the button is currently held down
+/**
+  Checks if the button is currently held down.
+  @param input the button to check
+  @return the state of the button
+ */
 bool Gamer::isHeld(uint8_t input)
 {
   bool result = (PINC & (1<<input)) >> input;
   return !result;
 }
 
-// Returns the current value of the LDR
+/**
+  Returns the current value of the LDR
+  @return LDR value between 0 and 1023
+ */
 int Gamer::ldrValue()
 {
   return analogRead(LDR);
 }
 
-// Change the button threshold for the LDR.
+/**
+  Changes the "pressed" event threshold for the LDR.
+  @param threshold the difference in light that triggers the event
+ */
 void Gamer::setldrThreshold(uint16_t threshold)
 {
   ldrThreshold = threshold;
@@ -219,13 +246,18 @@ void Gamer::setldrThreshold(uint16_t threshold)
 
 // Outputs -------------------------------
 
-// Set the display's refresh rate. 1 = 1 row per timer cycle. 10 = 1 row every 10 timer cycles
+/**
+  Sets the display's refresh rate. 1 = 1 row per timer cycle. 10 = 1 row every 10 timer cycles.
+  @param refreshRate the display's refresh rate modulo against the timer.
+ */
 void Gamer::setRefreshRate(uint16_t refreshRate)
 {
   _refreshRate = refreshRate;
 }
 
-// Burns the display[][] array onto the display. Only call when you're done changing pixels!
+/**
+  Burns the display[][] array onto the display. Call this when you're done changing pixels in your game.
+ */
 void Gamer::updateDisplay()
 {
   byte newImage[8];
@@ -241,7 +273,9 @@ void Gamer::updateDisplay()
   }
 }
 
-// Turn on all pixels on display
+/**
+  Turns on all the pixels on the display.
+ */
 void Gamer::allOn()
 {
   for(int j=0; j<8; j++) {
@@ -250,6 +284,9 @@ void Gamer::allOn()
   updateDisplay();
 }
 
+/**
+  Clears all pixels off the display.
+ */
 void Gamer::clear()
 {
   for(int j=0; j<8; j++) {
@@ -258,7 +295,10 @@ void Gamer::clear()
   updateDisplay();
 }
 
-// Print an 8 byte array onto the display
+/**
+  Prints an 8 byte array onto the display. 
+  @param img the 8 byte array to display
+ */
 void Gamer::printImage(byte* img)
 {
   for(int j=0; j<8; j++) {
@@ -269,7 +309,12 @@ void Gamer::printImage(byte* img)
   updateDisplay();
 }
 
-// Print a byte array onto the display, at an X/Y position.
+/**
+  Prints an 8 byte array onto the display at an X/Y position.
+  @param img the 8 byte array to display
+  @param x the image's x position
+  @param y the image's y position
+ */
 void Gamer::printImage(byte* img, int x, int y)
 {
   for(int j=0; j<8; j++) {
@@ -282,22 +327,27 @@ void Gamer::printImage(byte* img, int x, int y)
   updateDisplay();
 }
 
-// Set the value of the Gamer LED
+/**
+  Sets the value of the red LED.
+  @param value the LED's boolean value
+ */
 void Gamer::setLED(bool value)
 {
   digitalWrite(LED, value);
 }
 
-// Toggle the Gamer LED
+/**
+  Toggles the value of the red LED.
+ */
 void Gamer::toggleLED()
 {
   digitalWrite(LED, !digitalRead(LED));
 }
 
-// Internal display refreshing and writing to ICs ----------------------
-
-// Load the next row in the display.
-void Gamer::updateRow() 
+/**
+  Displays the next row on the display to achieve row scanning.
+ */
+void Gamer::updateRow()
 {
   if(counter==8) {
     counter = 0;
@@ -310,8 +360,11 @@ void Gamer::updateRow()
   counter++;
 }
 
-// Writes to the TLC5916 LED driver (cathodes)
-void Gamer::writeToDriver(byte dataOut) 
+/**
+  Writes a byte to the TLC5916 LED driver (cathodes).
+  @param dataOut the byte to write to the driver
+ */
+void Gamer::writeToDriver(byte dataOut)
 {
   // Output enable HIGH
   PORTB |= _BV(PORTB2);
@@ -330,8 +383,11 @@ void Gamer::writeToDriver(byte dataOut)
   PORTB &= ~_BV(PORTB2);
 }
 
-// Write to the MIC5891 shift register (anodes)
-void Gamer::writeToRegister(byte dataOut) 
+/**
+  Writes a byte to the MIC5891 shift register (anodes).
+  @param dataOut the byte to write to the register
+ */
+void Gamer::writeToRegister(byte dataOut)
 {
   for(int y=0; y<=7; y++) {
     if((dataOut & (1<<y)) >> y) PORTB |= _BV(PORTB0);
@@ -344,7 +400,9 @@ void Gamer::writeToRegister(byte dataOut)
   PORTB &= ~_BV(PORTB1);
 }
 
-// Periodically check if inputs are pressed (+ debouncing)
+/**
+  Checks if inputs have changed to track button and LDR events.
+ */
 void Gamer::checkInputs()
 {
   for(int i=0; i<6; i++) {
@@ -365,7 +423,10 @@ void Gamer::checkInputs()
   }
 }
 
-// Run Interrupt Service Routine tasks
+/**
+  Runs routines within the Interrupt Service Routine.
+  Display updating, button event tracking, LDR updating.
+ */
 void Gamer::isrRoutine()
 {
   if(ir == 1){
@@ -386,7 +447,11 @@ void Gamer::isrRoutine()
 }
 
 #ifdef MULTIPLAYER
-void Gamer::sendIr(String message)
+/**
+  Sends a string through the IR transmitter.
+  @param message the string that will be transmitted
+ */
+void Gamer::irSend(String message)
 {
   String mes = message;
   for(int i=0; i<mes.length(); i++) {
@@ -395,6 +460,10 @@ void Gamer::sendIr(String message)
   }
 }
 
+/**
+  Returns a string received from the IR receiver.
+  @return the string received by the IR receiver
+ */
 String Gamer::irReceive(){
   char ch;
   String message;
@@ -402,7 +471,7 @@ String Gamer::irReceive(){
 
   int n, i;
   n = _serial.available();
-  
+
   i = n;
 
   while(i--){
@@ -418,6 +487,10 @@ String Gamer::irReceive(){
 }
 #endif
 
+/**
+  Scrolls a string across the display.
+  @param string the string that will be scrolled
+ */
 void Gamer::printString(String string)
 {
   byte screen[8]={0};
@@ -435,9 +508,14 @@ void Gamer::printString(String string)
     }
   }
   for( int i=0; i<8; i++)
-    appendColumn(screen, 0);
+  appendColumn(screen, 0);
 }
 
+/**
+  Appends the column for scrolling the string across the display.
+  @param screen the current screen to append.
+  @param col the column to add
+ */
 void Gamer::appendColumn(byte* screen, byte col)
 {
   for( int i=0; i<8; i++){
@@ -448,6 +526,10 @@ void Gamer::appendColumn(byte* screen, byte col)
   delay(70);
 }
 
+/**
+  Shows the score. Maximum 2 digits :(
+  @param n the score to be displayed
+ */
 void Gamer::showScore(int n)
 {
   byte result[8];
@@ -455,12 +537,15 @@ void Gamer::showScore(int n)
   int dig2=n%10;
   for(int p=0;p<8;p++) {
     result[p]=allNumbers[dig2][p];
-    if( dig1>0 ) 
-      result[p]|=(allNumbers[dig1][p]<<4);
+    if( dig1>0 )
+    result[p]|=(allNumbers[dig1][p]<<4);
   }
   printImage(result);
 }
 
+/**
+  All the letters in the world.
+ */
 const uint8_t Gamer::allLetters[53][9] = {
   {B00000000,B00000000,B00000000,LETEND},   // space
   {B01111110,B10010000,B10010000,B10010000,B01111110,B00000000,LETEND}, // A
@@ -517,6 +602,9 @@ const uint8_t Gamer::allLetters[53][9] = {
   {B00100110,B00101010,B00110010,B00000000,LETEND} // z
 };
 
+/**
+  All the numbers in the world.
+ */
 const uint8_t Gamer::allNumbers[10][8] = {
   { B00000010,B00000101,B00000101,B00000101,B00000101,B00000101,B00000101,B00000010 },
   { B00000010,B00000110,B00000010,B00000010,B00000010,B00000010,B00000010,B00000111 },

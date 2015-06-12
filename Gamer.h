@@ -8,6 +8,8 @@
 
 class Gamer {
 public:
+	
+	// Constructor
 	Gamer();
 	
 	// Keywords
@@ -45,9 +47,9 @@ public:
 	void appendColumn(byte* screen, byte col);
 	void showScore(int n);
 
-	// Infared (BETA)
+	// Infrared
 	String irReceive();
-	void sendIr(String message);
+	void irSend(String message);
 	
 	// Variables
 	byte display[8][8];
@@ -58,6 +60,7 @@ public:
 	byte counter;
 	byte image[8];
 	
+	// Routines attached to the timer's ISR
 	void isrRoutine();
 	
 private:
