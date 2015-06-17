@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include "SoftwareSerial.h"
 
 class Gamer {
 public:
@@ -12,6 +13,9 @@ public:
 	// Constructor
 	Gamer();
 	
+	// Software serial for IR communication
+	SoftwareSerial _serial;
+
 	// Keywords
 	#define UP 0
 	#define LEFT 1
@@ -41,8 +45,8 @@ public:
 	void toggleLED();
 	void playTone(int note);
 	void stopTone();
-	void irPlay();
-	void irStop();
+	void irBegin();
+	void irEnd();
 	void printString(String string);
 	void appendColumn(byte* screen, byte col);
 	void showScore(int n);

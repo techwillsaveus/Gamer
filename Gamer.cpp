@@ -11,15 +11,9 @@ bool playTog = false;
 bool toneStopped = false;
 char prevChar;
 
-// Include SoftSerial for IR communication
-#ifdef MULTIPLAYER
-#include "SoftwareSerial.h"
-SoftwareSerial _serial;
-#endif
-
 Gamer *thisGamer = NULL;
 
-// Interrupt service routine
+// Interrupt service routine.
 ISR(TIMER2_COMPB_vect)
 {
   if(ir == 1) {
@@ -28,12 +22,12 @@ ISR(TIMER2_COMPB_vect)
 
 }
 
+// Interrupt service routine for simultaneous IR & buzzer.
 ISR(TIMER2_COMPA_vect)
 {
   if(ir == 0) {
     if(toneIsPlaying) {
       if (toggleVal) {
-        // digitalWrite(2,HIGH);
         PORTD |= _BV(PORTD2);
         toggleVal = 0;
         if(split % 10 == 0 ){
@@ -42,7 +36,6 @@ ISR(TIMER2_COMPA_vect)
         split++;
       }
       else {
-        // digitalWrite(2,LOW);
         PORTD &= ~_BV(PORTD2);
         toggleVal = 1;
         if(split % 10== 0 ) {
@@ -53,7 +46,6 @@ ISR(TIMER2_COMPA_vect)
       split++;
     }
     else {
-      // digitalWrite(2,LOW);
       PORTD &= ~_BV(PORTD2);
       if(split % 10 == 0 ) {
         thisGamer->isrRoutine();
@@ -63,15 +55,12 @@ ISR(TIMER2_COMPA_vect)
   }
 }
 
-// If Multiplayer is enabled, open up the IR serial.
-#ifdef MULTIPLAYER
+/**
+  Constructor. Also initiates software serial for IR
+	communiation.
+ */
 Gamer::Gamer() : _serial(5,4) {
 }
-#endif
-#ifndef MULTIPLAYER
-Gamer::Gamer(){
-}
-#endif
 
 /**
   Plays a tone on the buzzer.
@@ -124,7 +113,7 @@ void Gamer::stopTone()
     split = 0;
     toggleVal = 0;
     irTog = false;
-    irPlay();
+    irBegin();
   }
 
   OCR1A = 14;
@@ -134,7 +123,7 @@ void Gamer::stopTone()
 /**
   Stops the 38KHz wave for the IR transmitter.
  */
-void Gamer::irStop()
+void Gamer::irEnd()
 {
   irTog = false;
 }
@@ -142,7 +131,7 @@ void Gamer::irStop()
 /**
   Creates a 38KHz wave for the IR transmitter.
  */
-void Gamer::irPlay()
+void Gamer::irBegin()
 {
   TIMSK2 &= ~(1<<OCIE2A);
   TIMSK2 &= (1<<OCIE1B);
@@ -176,9 +165,9 @@ void Gamer::irPlay()
 void Gamer::begin()
 {
   ::thisGamer = this;
-  #ifdef MULTIPLAYER
+  //#ifdef MULTIPLAYER
   _serial.begin(2400);
-  #endif
+  //#endif
   _refreshRate = 50;
   ldrThreshold = 300;
 
@@ -196,7 +185,7 @@ void Gamer::begin()
   //Analog Read 16 divisor
   ADCSRA &= ~(1 << ADPS2);
 
-  irPlay();
+  irBegin();
 }
 
 // Inputs --------------------------------
@@ -446,7 +435,7 @@ void Gamer::isrRoutine()
   }
 }
 
-#ifdef MULTIPLAYER
+//#ifdef MULTIPLAYER
 /**
   Sends a string through the IR transmitter.
   @param message the string that will be transmitted
@@ -485,7 +474,7 @@ String Gamer::irReceive(){
   return message;
 
 }
-#endif
+//#endif
 
 /**
   Scrolls a string across the display.
