@@ -1,20 +1,18 @@
-
 #ifndef Gamer_h
 #define Gamer_h
 
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "SoftwareSerial.h"
+#include "SoftwareSerial.h" 
 
 class Gamer {
 public:
-	
 	// Constructor
 	Gamer();
-	
+
 	// Software serial for IR communication
-	SoftwareSerial _serial;
+	//SoftwareSerial _serial;
 
 	// Keywords
 	#define UP 0
@@ -45,15 +43,17 @@ public:
 	void toggleLED();
 	void playTone(int note);
 	void stopTone();
-	void irBegin();
-	void irEnd();
 	void printString(String string);
 	void appendColumn(byte* screen, byte col);
 	void showScore(int n);
 
 	// Infrared
+	void irBegin();
+	void irEnd();
+	//#ifdef MULTIPLAYER
 	String irReceive();
 	void irSend(String message);
+	//#endif
 	
 	// Variables
 	byte display[8][8];

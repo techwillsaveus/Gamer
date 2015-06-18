@@ -59,9 +59,13 @@ ISR(TIMER2_COMPA_vect)
   Constructor. Also initiates software serial for IR
 	communiation.
  */
-Gamer::Gamer() : _serial(5,4) {
+//#ifdef MULTIPLAYER
+//Gamer::Gamer() : _serial(5,4) {
+//}
+//#else
+Gamer::Gamer() {
 }
-
+//#endif
 /**
   Plays a tone on the buzzer.
   @param note the desired frequency
@@ -165,9 +169,11 @@ void Gamer::irBegin()
 void Gamer::begin()
 {
   ::thisGamer = this;
+	
   //#ifdef MULTIPLAYER
-  _serial.begin(2400);
+  //_serial.begin(2400);
   //#endif
+
   _refreshRate = 50;
   ldrThreshold = 300;
 
@@ -440,6 +446,7 @@ void Gamer::isrRoutine()
   Sends a string through the IR transmitter.
   @param message the string that will be transmitted
  */
+ /*
 void Gamer::irSend(String message)
 {
   String mes = message;
@@ -448,11 +455,12 @@ void Gamer::irSend(String message)
     _serial.write(~mes.charAt(i));
   }
 }
-
+*/
 /**
   Returns a string received from the IR receiver.
   @return the string received by the IR receiver
  */
+ /*
 String Gamer::irReceive(){
   char ch;
   String message;
@@ -475,7 +483,7 @@ String Gamer::irReceive(){
 
 }
 //#endif
-
+*/
 /**
   Scrolls a string across the display.
   @param string the string that will be scrolled
