@@ -10,7 +10,7 @@ GamerIR::GamerIR() : _serial(5, 4) {
   Sends a string through the IR transmitter.
   @param message the string that will be transmitted
  */
-void GamerIR::irSend(String message)
+void GamerIR::send(String message)
 {
   String mes = message;
   for(int i=0; i<mes.length(); i++) {
@@ -23,7 +23,7 @@ void GamerIR::irSend(String message)
   Returns a string received from the IR receiver.
   @return the string received by the IR receiver
  */
-String GamerIR::irReceive(){
+String GamerIR::receive(){
   char ch;
   String message;
   char cch,incch;

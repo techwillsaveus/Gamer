@@ -1,4 +1,5 @@
 #include <Gamer.h>
+#include <GamerIR.h>
 #include <SoftwareSerial.h>
 
 #define NUMFRAMESSENDANIMATION 12
@@ -224,10 +225,10 @@ byte receiveAnimation[NUMFRAMESRECEIVEANIMATION][8] = {
 
 
 Gamer gamer;
+GamerIR infrared;
 
 void setup() {
   gamer.begin();
-  gamer.irSend("Hello");
 }
 
 void loop() {
@@ -237,10 +238,10 @@ void loop() {
       gamer.printImage(sendAnimation[i]);
       delay(100);
     }
-    gamer.irSend("hi");
+    infrared.send("hi");
   }
   // If hi is received, play receive  animation.
-  if(gamer.irReceive() == "hi") {
+  if(infrared.receive() == "hi") {
     for(int i=0; i<NUMFRAMESRECEIVEANIMATION; i++) {
       gamer.printImage(receiveAnimation[i]);
       delay(100);

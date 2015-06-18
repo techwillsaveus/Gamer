@@ -4,15 +4,11 @@
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "SoftwareSerial.h" 
 
 class Gamer {
 public:
 	// Constructor
 	Gamer();
-
-	// Software serial for IR communication
-	//SoftwareSerial _serial;
 
 	// Keywords
 	#define UP 0
@@ -50,10 +46,6 @@ public:
 	// Infrared
 	void irBegin();
 	void irEnd();
-	//#ifdef MULTIPLAYER
-	String irReceive();
-	void irSend(String message);
-	//#endif
 	
 	// Variables
 	byte display[8][8];

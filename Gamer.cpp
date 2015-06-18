@@ -170,10 +170,6 @@ void Gamer::begin()
 {
   ::thisGamer = this;
 	
-  //#ifdef MULTIPLAYER
-  //_serial.begin(2400);
-  //#endif
-
   _refreshRate = 50;
   ldrThreshold = 300;
 
@@ -441,49 +437,6 @@ void Gamer::isrRoutine()
   }
 }
 
-//#ifdef MULTIPLAYER
-/**
-  Sends a string through the IR transmitter.
-  @param message the string that will be transmitted
- */
- /*
-void Gamer::irSend(String message)
-{
-  String mes = message;
-  for(int i=0; i<mes.length(); i++) {
-    _serial.write(mes.charAt(i));
-    _serial.write(~mes.charAt(i));
-  }
-}
-*/
-/**
-  Returns a string received from the IR receiver.
-  @return the string received by the IR receiver
- */
- /*
-String Gamer::irReceive(){
-  char ch;
-  String message;
-  char cch,incch;
-
-  int n, i;
-  n = _serial.available();
-
-  i = n;
-
-  while(i--){
-    ch = _serial.read();
-    if(ch == ~prevChar) message = message+prevChar;
-    prevChar = ch;
-
-  }
-
-  //String messo = message;
-  return message;
-
-}
-//#endif
-*/
 /**
   Scrolls a string across the display.
   @param string the string that will be scrolled
