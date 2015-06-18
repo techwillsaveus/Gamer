@@ -238,10 +238,10 @@ void loop() {
       gamer.printImage(sendAnimation[i]);
       delay(100);
     }
-    infrared.send("hi");
+    infrared.send("h");
   }
   // If hi is received, play receive  animation.
-  if(infrared.receive() == "hi") {
+  if(infrared.receive() == "h") {
     for(int i=0; i<NUMFRAMESRECEIVEANIMATION; i++) {
       gamer.printImage(receiveAnimation[i]);
       delay(100);
