@@ -1,6 +1,0 @@
-#include "GamerIR.h"
-
-public static void GamerIR::hello() 
-{
-	
-}
