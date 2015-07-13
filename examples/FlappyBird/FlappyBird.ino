@@ -8,8 +8,10 @@ game more difficult. Or make it easier by changing the flyingSpeed
 of the bird!
 */
 
+// Include Gamer library.
 #include <Gamer.h>
 
+// Create a copy of the Gamer library.
 Gamer gamer;
 
 // General
