@@ -1,43 +1,30 @@
-// FOUR GAMES IN ONE! YEAAAHHHH!!!
+/*
+This example demonstrates how to load multiple games into the Gamer.
+It's not a super straightforward process, so we thought we'd show
+you an example of running four games at the same time. 
 
+In order to have more than one game, we need to separate out all the
+game logic, variables, and functions of each game into separate tabs
+in the Arduino environment. 
+
+After we do that, we can select a game from a menu screen.
+
+This example was written by the wonderful Finnbar Keating (github: finnbar).
+If you have more specific questions, give him a ping on Twitter (@_finnbar)!
+*/
+
+// Include Gamer library.
 #include <Gamer.h>
+
+// Include game tabs.
 #include <breakout.h>
 #include <flappy.h>
 #include <simon.h>
 #include <snake.h>
 #include <advanced.h>
 
+// Create a copy of the Gamer library.
 Gamer gamer;
-
-//note to any future programmers: bytes take up less
-//space, so should be used for smaller numbers!
-
-/*
-DEAR CODER / SOURCE-CODE READER / INQUISITIVE PERSON:
- You may be wondering why some of the variables in this
- program sound dangerous, or 'volatile'.
- This is to do with how memory is stored.
- Now, Arduino has 32256 bytes to store a program with,
- which is quite a lot. HOWEVER, this doesn't take variables
- into account at all - they in fact get a grand total of 2kb
- of space to themselves in an area called SRAM. Unfortunately,
- 2kb is not a lot - for example, the variable inGameScreen in
- flappy.ino takes up one byte per entry in the table - that adds
- up to 64 bytes, and if it were an int[], it would take two bytes
- per entry, or 128 bytes out of 2048 bytes. That's a lot.
- 
- This is where volatile comes in. The variables that don't talk to
- the Gamer library in any way don't really mind where they are put,
- so they can be put elsewhere by the volatile keyword which loads the
- variable directly into the RAM as opposed to a storage register.
- This reduces the amount of memory the program takes up and allows it to
- run more smoothly.
- 
- But why do we even need to keep memory in mind? Simple. Arduino (and C
- in general) allocates memory before code execution, so all the games
- take up a lot of space - meaning that there's very little space left
- for the Arduino to do stuff, so it panics and freezes.
- */
 
 byte startup[16][8]; //declare at top of code
 byte snake[16][8];  //snake animation
