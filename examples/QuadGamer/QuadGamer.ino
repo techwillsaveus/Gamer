@@ -16,13 +16,6 @@ If you have more specific questions, give him a ping on Twitter (@_finnbar)!
 // Include Gamer library.
 #include <Gamer.h>
 
-// Include game tabs.
-#include <breakout.h>
-#include <flappy.h>
-#include <simon.h>
-#include <snake.h>
-#include <advanced.h>
-
 // Create a copy of the Gamer library.
 Gamer gamer;
 
