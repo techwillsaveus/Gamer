@@ -95,7 +95,7 @@ private:
 
 	// Numbers and letters for printString
 	#define LETEND B10101010
-	const static uint8_t allLetters[53][9];
+	const static uint8_t allLetters[75][9];
 	const static uint8_t allNumbers[10][8];
 };
 
