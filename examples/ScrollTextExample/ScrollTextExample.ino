@@ -16,5 +16,5 @@ void setup() {
 
 void loop() {
   // Print "Hello world"
-  gamer.printString("Hello world");
+  gamer.printString("Hello world! :D");
 }
