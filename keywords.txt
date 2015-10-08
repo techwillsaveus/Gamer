@@ -10,6 +10,7 @@ isPressed	KEYWORD2
 isHeld	KEYWORD2
 ldrValue	KEYWORD2
 setldrThreshold	KEYWORD2
+capTouch KEYWORD2
 setRefreshRate	KEYWORD2
 updateDisplay	KEYWORD2
 allOn	KEYWORD2
