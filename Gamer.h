@@ -16,6 +16,7 @@ public:
 	#define RIGHT 2
 	#define DOWN 3
 	#define START 4
+	//Note: Gamer v1.9 is Capacitive touch instead of LDR.
 	#define LDR 5
 	
 	// Setup
@@ -25,8 +26,11 @@ public:
 	// Inputs
 	bool isPressed(uint8_t input);
 	bool isHeld(uint8_t input);
+	//Note: Gamers preceding v1.9
 	int ldrValue();
 	void setldrThreshold(uint16_t threshold);
+	//Note: Gamer v1.9
+	bool capTouch();
 
 	// Outputs
 	void setRefreshRate(uint16_t refreshRate);

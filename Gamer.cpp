@@ -216,7 +216,6 @@ bool Gamer::isHeld(uint8_t input)
   bool result = (PINC & (1<<input)) >> input;
   return !result;
 }
-
 /**
   Returns the current value of the LDR
   @return LDR value between 0 and 1023
@@ -225,7 +224,6 @@ int Gamer::ldrValue()
 {
   return analogRead(LDR);
 }
-
 /**
   Changes the "pressed" event threshold for the LDR.
   @param threshold the difference in light that triggers the event
@@ -233,6 +231,98 @@ int Gamer::ldrValue()
 void Gamer::setldrThreshold(uint16_t threshold)
 {
   ldrThreshold = threshold;
+}
+
+/**
+  Gamer v1.9 capacitive touch instead of LDR
+*/
+bool Gamer::capTouch()
+{
+	pinMode(19, OUTPUT);
+
+	  digitalWrite(19, LOW);
+
+	  delay(1);
+
+	  // Prevent the timer IRQ from disturbing our measurement
+
+	  noInterrupts();
+
+	  // Make the pin an input with the internal pull-up on
+
+	  pinMode(19, INPUT_PULLUP);
+
+
+
+	  // Now see how long the pin to get pulled up. This manual unrolling of the loop
+
+	  // decreases the number of hardware cycles between each read of the pin,
+
+	  // thus increasing sensitivity.
+
+	  uint8_t cycles = 17;
+
+	       if (digitalRead(19)) { cycles =  0;}
+
+	  else if (digitalRead(19)) { cycles =  1;}
+
+	  else if (digitalRead(19)) { cycles =  2;}
+
+	  else if (digitalRead(19)) { cycles =  3;}
+
+	  else if (digitalRead(19)) { cycles =  4;}
+
+	  else if (digitalRead(19)) { cycles =  5;}
+
+	  else if (digitalRead(19)) { cycles =  6;}
+
+	  else if (digitalRead(19)) { cycles =  7;}
+
+	  else if (digitalRead(19)) { cycles =  8;}
+
+	  else if (digitalRead(19)) { cycles =  9;}
+
+	  else if (digitalRead(19)) { cycles = 10;}
+
+	  else if (digitalRead(19)) { cycles = 11;}
+
+	  else if (digitalRead(19)) { cycles = 12;}
+
+	  else if (digitalRead(19)) { cycles = 13;}
+
+	  else if (digitalRead(19)) { cycles = 14;}
+
+	  else if (digitalRead(19)) { cycles = 15;}
+
+	  else if (digitalRead(19)) { cycles = 16;}
+
+	  // End of timing-critical section
+
+	  interrupts();
+
+	  // Discharge the pin again by setting it low and output
+
+	  //  It's important to leave the pins low if you want to 
+
+	  //  be able to touch more than 1 sensor at a time - if
+
+	  //  the sensor is left pulled high, when you touch
+
+	  //  two sensors, your body will transfer the charge between
+
+	  //  sensors.
+
+	  digitalWrite(19, LOW);
+
+	  pinMode(19, OUTPUT);
+
+
+	  if(cycles > 0){
+		  return true;
+	  } else {
+	  	  return false;
+	  }
+	
 }
 
 // Outputs -------------------------------
